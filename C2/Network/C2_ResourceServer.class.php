@@ -29,6 +29,7 @@ class C2_ResourceServer
         if (empty($this->_hosts)) {
             throw new C2_Exception('Empty hosts.');
         }
+        $this->_error = null;
         foreach ($this->_hosts as $host) {
             switch ($this->_protocol) {
                 case 'http':
@@ -63,6 +64,14 @@ class C2_ResourceServer
                         $this->_error[] = array($host, 'Connect failed');
                         continue;
                     }
+                    // Fingerprint
+                    if (!empty($this->_fields['knownhosts'])) {
+                        $fingerprint = ssh2_fingerprint($con, SSH2_FINGERPRINT_MD5 | SSH2_FINGERPRINT_HEX);
+                        if (!in_array($fingerprint, $this->_fields['knownhosts'])) {
+                            $this->_error[] = array($host, 'Fingerprint mismatch');
+                            continue;
+                        }
+                    }
                     // Password authentication.
                     if (!empty($this->_fields['user']) && !empty($this->_fields['pass'])) {
                         $a = ssh2_auth_password($con, $this->_fields['user'], $this->_fields['pass']);
@@ -76,14 +85,6 @@ class C2_ResourceServer
                         $p = ssh2_auth_pubkey_file($con, $this->_fields['user'], $this->_fields['pubkeyfile'], $this->_fields['privkeyfile'], $this->_fields['passphrase']);
                         if ($p === false) {
                             $this->_error[] = array($host, 'Pubkey authentication failed');
-                            continue;
-                        }
-                    }
-                    // Fingerprint
-                    if (!empty($this->_fields['knownhosts'])) {
-                        $fingerprint = ssh2_fingerprint($con, SSH2_FINGERPRINT_MD5 | SSH2_FINGERPRINT_HEX);
-                        if (!in_array($fingerprint, $this->_fields['knownhosts'])) {
-                            $this->_error[] = array($host, 'Fingerprint mismatch');
                             continue;
                         }
                     }

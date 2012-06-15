@@ -1,5 +1,6 @@
 <?php
 require_once 'C2_Repository.class.php';
+require_once __DIR__ . '/../../../Exception/C2_DBException.class.php';
 
 class C2_PDO_Repository implements C2_Repository
 {
@@ -13,7 +14,7 @@ class C2_PDO_Repository implements C2_Repository
         if ($config === false) {
             throw new C2_DBException('Failed to load db configuration file. filepath=' . $path);
         }
-        self::$_dsn[$target] = array(
+        self::$_dsn = array(
             'phptype' => $config['phptype'],
             'username' => $config['user'],
             'password' => $config['pass'],
@@ -26,21 +27,22 @@ class C2_PDO_Repository implements C2_Repository
         );
     }
     
-    public static function getConnection($target = 'master')
+    public static function getConnection()
     {
         if (self::$_dsn === null) {
             throw new C2_DBException('Not set db configuration. Use init method before getting db connection.');
         }
         try {
-            $connection = new PDO(self::$_dsn['phptype'] . ':host=' . self::$_dsn['hostspec'] . ';dbname=' . self::$_dsn['database'], self::$_dsn['username'], self::$_dsn['password'], self::$_options);
+            $con = new PDO(self::$_dsn['phptype'] . ':host=' . self::$_dsn['hostspec'] . ';dbname=' . self::$_dsn['database'], self::$_dsn['username'], self::$_dsn['password'], self::$_options);
         } catch (PDOException $e) {
+            var_dump(self::$_dsn['phptype'] . ':host=' . self::$_dsn['hostspec'] . ';dbname=' . self::$_dsn['database']);
             throw new C2_DBException($e->getMessage());
         }
-        return $connection;
+        return $con;
     }
     
-    public static function destroyConnection($connection)
+    public static function destroyConnection($con)
     {
-        $connection = null;
+        $con = null;
     }
 }
