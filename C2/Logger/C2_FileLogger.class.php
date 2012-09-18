@@ -82,7 +82,6 @@ class C2_Logger
     private static function _putFile($facility, $message)
     {
         $filename = sprintf('%s_%s.log', $facility, date('Ymd'));
-        $outputFile = self::$_path . $filename;
         if (!$fp = @fopen(self::$_path . $filename, 'a')) {
             die("can't open log file. " . self::$_path . $filename);
         }
@@ -92,10 +91,10 @@ class C2_Logger
         fclose($fp);
     }
     
-    private static function _buildMessage($facility, $outputString, $trace = false)
+    private static function _buildMessage($facility, $outputString, $addTrace = false)
     {
     	$message = sprintf("%s [%s][%s](%s)[%s] %s\n", date('c'), $facility, $_SERVER['SERVER_ADDR'], $_SERVER['REQUEST_URI'], $_SERVER['REMOTE_ADDR'], $outputString);
-    	if ($trace === true) {
+    	if ($addTrace === true) {
     		$message .= print_r(debug_backtrace(), true);
     	}
     	return $message;

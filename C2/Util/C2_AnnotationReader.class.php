@@ -23,7 +23,7 @@ final class C2_AnnotationReader
                 if (isset($matches[2])) {
                     $annoArgs = explode(' ', trim($matches[2]));
                 }
-                array_push($annos, array('command' => $matches[1], 'args' => $annoArgs));
+                array_push($annos, array('cmd' => $matches[1], 'args' => $annoArgs));
             }
         }
         return $annos;
@@ -31,9 +31,9 @@ final class C2_AnnotationReader
     
     /**
      * Get annotation command arguments.
-     * 
+     *
      * ex.) "@exampleCommand arg1 arg2" => array('arg1', 'arg2')
-     * 
+     *
      * @param string $comment docComment
      * @param string $commandName annotation command name which you want to get arguments.
      */
@@ -44,7 +44,7 @@ final class C2_AnnotationReader
     	}
     	$annos = self::getAnnotations($comment);
 		foreach ($annos as $anno) {
-			if ($anno['command'] == $commandName) {
+			if ($anno['cmd'] == $commandName) {
 				return $anno['args'];
 			}
 		}
