@@ -5,9 +5,9 @@ class C2_Util
 	/**
 	 * Returns converted string including underscore to camel case.
 	 * ex.) hoge_sample => hogeSample
-	 * 
+	 *
 	 * If argument is not string, return empty string.
-	 * 
+	 *
 	 * @param string $string
 	 */
 	public static function toCamel($string)
@@ -38,16 +38,16 @@ class C2_Util
 	}
 	
 	/**
-	 * preg_match mapper. 
+	 * preg_match wrapper.
 	 * Easy to get value using preg_match.
-	 * 
-	 * @param regex $regex
-	 * @param unknown_type $value
-	 * @return unknown|NULL
+	 *
+	 * @param string $regex
+	 * @param string $value
+	 * @return mixed|NULL
 	 */
 	public static function pregGet($regex, $value)
 	{
-		$matchNum = preg_match($regex, $subject, $matches, PREG_OFFSET_CAPTURE);
+		$matchNum = preg_match($regex, $value, $matches, PREG_OFFSET_CAPTURE);
 		if ($matchNum > 0) {
 			return $matches[1];
 		}
