@@ -1,18 +1,18 @@
 <?php
+
 class AmazonS3Gateway
 {
     private $s3;
-    private $logger;
+    private $bucket;
     
     public function __construct()
     {
         $this->s3 = new AmazonS3();
-        global $s3_config;
-        if ($s3_config === null) {
-            $this->s3->set_region(AmazonS3::REGION_TOKYO);
-        } else {
-            $this->s3->set_region($s3_config['region']);
-        }
+    }
+    
+    public function setRegion($region = AmazonS3::REGION_TOKYO)
+    {
+        $this->s3->set_region($region);
     }
     
     /**
@@ -20,28 +20,25 @@ class AmazonS3Gateway
      *
      * @param string $path
      * @param string $destPath
+     * @param boolean $isS3Copy S3同士のファイルコピーを行うかどうか
      * @return boolean true/false
      */
     public function upload($path, $destPath, $isS3Copy = false)
     {
-        global $s3_config;
         $imageSize = @getimagesize($path);
         if ($imageSize === false) {
             return false;
         }
-        if ($imageSize['mime'] !== 'image/jpeg' && $imageSize['mime'] !== 'image/png' && $imageSize['mime'] !== 'image/gif') {
-            return false;
-        }
         $parseUrl = parse_url($path);
-        $source_filename = ltrim($parseUrl['path'], '/' . $s3_config['bucket']);
+        $source_filename = ltrim($parseUrl['path'], '/' . $this->bucket);
         $dest_filename = ltrim($destPath, '/');
         
         if ($isS3Copy === true) {
             $response = $this->s3->copy_object(array( // $source
-                    'bucket' => $s3_config['bucket'],
+                    'bucket' => $this->bucket,
                     'filename' => $source_filename
                 ), array( // $dest
-                    'bucket' => $s3_config['bucket'],
+                    'bucket' => $this->bucket,
                     'filename' => $dest_filename
                 ), array( // $opt
                     'acl' => AmazonS3::ACL_PUBLIC
@@ -49,7 +46,7 @@ class AmazonS3Gateway
             );
         } else {
             $response = $this->s3->create_object(
-                strtolower($s3_config['bucket']),
+                strtolower($this->bucket),
                 ltrim($destPath, '/'),
                 array(
                     'fileUpload' => $path,
@@ -72,9 +69,8 @@ class AmazonS3Gateway
      */
     public function delete($targetPath)
     {
-        global $s3_config;
         $response = $this->s3->delete_objects(
-            $s3_config['bucket'],
+            $this->bucket,
             array(
                 'objects' => array(array('key' => $targetPath))
             )

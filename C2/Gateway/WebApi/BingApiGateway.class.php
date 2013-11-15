@@ -1,8 +1,10 @@
 <?php
 
-class BingException extends Exception
+class BingException extends C2_Exception
 {
-    public function __construct($message, $code = 100)
+    const ERROR_CODE = 710;
+    
+    public function __construct($message, $code = self::ERROR_CODE)
     {
         parent::__construct($message, $code);
     }
@@ -10,7 +12,9 @@ class BingException extends Exception
 
 class BingAuthorizationException extends BingException
 {
-    public function __construct($message, $code = 101)
+    const ERROR_CODE = 711;
+    
+    public function __construct($message, $code = self::ERROR_CODE)
     {
         parent::__construct($message, $code);
     }
@@ -18,15 +22,19 @@ class BingAuthorizationException extends BingException
 
 class BingInvalidArgumentException extends BingException
 {
-    public function __construct($message, $code = 102)
+    const ERROR_CODE = 712;
+    
+    public function __construct($message, $code = self::ERROR_CODE)
     {
         parent::__construct($message, $code);
     }
 }
 
-class BingRuntimeException extends RuntimeException
+class BingRuntimeException extends C2_RuntimeException
 {
-    public function __construct($message, $code = 150)
+    const ERROR_CODE = 713;
+    
+    public function __construct($message, $code = self::ERROR_CODE)
     {
         parent::__construct($message, $code);
     }

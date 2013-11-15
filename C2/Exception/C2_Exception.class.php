@@ -2,26 +2,20 @@
 
 class C2_Exception extends Exception
 {
-    protected $errorCode;
-    protected $errorMessage;
-
-    public function getErrorCode()
+    const ERROR_CODE = 500;
+    
+    public function __construct($message, $code = self::ERROR_CODE)
     {
-        return $this->errorCode;
+        parent::__construct($message, $code);
     }
+}
 
-    public function setErrorCode($errorCode)
+class C2_RuntimeException extends RuntimeException
+{
+    const ERROR_CODE = 600;
+    
+    public function __construct($message, $code = self::ERROR_CODE)
     {
-        $this->errorCode = $errorCode;
-    }
-
-    public function getErrorMessage()
-    {
-        return $this->errorMessage;
-    }
-
-    public function setErrorMessage($errorMessage)
-    {
-        $this->errorMessage = $errorMessage;
+        parent::__construct($message, $code);
     }
 }
