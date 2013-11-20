@@ -2,5 +2,5 @@
 
 interface C2_PageController
 {
-    public function dispatch();
+    public function assign();
 }
