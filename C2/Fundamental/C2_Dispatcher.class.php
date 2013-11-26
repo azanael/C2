@@ -1,24 +1,27 @@
 <?php
-require_once 'C2_AnnotationReader.class.php';
 
-/*
- * TODO MEMO
- * @noview outputしない
- * @login
- */
 class C2_Dispatcher
 {
     const CONTROLLER_ERROR = 'ErrorController';
     
-    public function dispatch($options = null, $controller = null)
+    public function dispatch($options = null, $controllerName = 'RootController')
     {
-        if ($controller === null) {
-            $controller = self::_findController();
+        if ($controllerName === null) {
+            $controllerName = self::_findController();
         }
+        $viewer = new C2_SmartyViewer();
         try {
-            
+            $controller = self::_getControllerInstance($controllerName);
+            $assigns = $controller->assign();
+            $template = self::_findTemplate();
+            if (!empty($assigns)) {
+                foreach ($assigns as $key => $value) {
+                    $viewer->assign($key, $value);
+                }
+            }
+            $viewer->view($template);
         } catch (Exception $e) {
-            
+            $viewer->view('503.tpl');
         }
     }
     
@@ -37,23 +40,21 @@ class C2_Dispatcher
         return $controller;
     }
     
-    private static function _getControllerInstance($controller)
+    private static function _getControllerInstance($controllerName, $options = null)
     {
-        if (!is_file($controller)) {
-            if ($controller === self::CONTROLLER_ERROR) {
-                throw new C2_Exception("CRITICAL: Both Controller $controller and Error Controller are not existed!");
+        if (!is_file($controllerName)) {
+            if ($controllerName === self::CONTROLLER_ERROR) {
+                throw new C2_Exception("CRITICAL: Both Controller $controllerName and Error Controller are not existed!");
             }
             return self::_getControllerInstance(self::CONTROLLER_ERROR);
         }
-        require_once C2_BASE_DIR . '/App/' . $controller;
-        $className = substr($controller, strrpos($controller, '/'));
-        $reflection = new ReflectionClass($className);
-        $annoReader = new C2_AnnotationReader();
-        $annos = $annoReader->getAnnotations($reflection->getDocComment());
-        if (!empty($annos)) {
-            foreach ($annos as $anno) {
-            }
-        }
+        require_once C2_BASE_DIR . '/App/' . $controllerName;
+        $className = substr($controllerName, strrpos($controllerName, '/'));
+        return new $className();
+    }
+    
+    private static function _findTemplate()
+    {
         
     }
 }
